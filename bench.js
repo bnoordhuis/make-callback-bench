@@ -1,16 +1,10 @@
 "use strict"
 
-const pp = console.log
-const {nodeMakeCallback, v8FunctionCall} = require("./build/Release/binding")
+run("v8-function-call")
+run("node-make-callback")
 
-function bench(n, f, ...xs) {
-    const a = Date.now()
-    f.call(null, n, {}, () => {}, ...xs)
-    const b = Date.now()
-    return (1e6 * (b - a)) / n // ms -> ns/op
+function run(name) {
+    const {spawnSync} = require("node:child_process")
+    const args = [`./bench/${name}.js`]
+    spawnSync(process.execPath, args, {stdio: "inherit"})
 }
-
-const a = bench(7e6, nodeMakeCallback)
-const b = bench(7e6, v8FunctionCall)
-pp(a.toFixed(1), "\t", "node::MakeCallback")
-pp(b.toFixed(1), "\t", "v8::Function::Call")
